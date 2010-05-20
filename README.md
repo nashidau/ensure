@@ -32,6 +32,8 @@ Future Tools
 
    * Image objecthas valid image file
    * Invalid colour
+   	- A > max(r,g,b)
+	- A == 0 (invisible)
    * Object clipped to a smart's clip, but not a member
    * Object not clipped to it's smart parrent (subtly different)
    * Object of size 0
