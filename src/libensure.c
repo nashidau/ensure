@@ -23,11 +23,13 @@ struct Ecore_Evas_Wrap {
 
 extern struct Ecore_Evas_Wrap *ecore_evases;
 
-FILE *outfile;
+static FILE *outfile;
 
 __attribute__((constructor)) void
 libensure_init(void){
 	int fd;
+	int sendfd;
+	const char *p;
 	sigset_t sigusr2;
 
 	ecore_init();
@@ -39,7 +41,18 @@ libensure_init(void){
 	ecore_main_fd_handler_add(fd,ECORE_FD_READ|ECORE_FD_ERROR,
 			libensure_dump, NULL,
 			NULL, NULL);
-	outfile = stdout;
+
+	p = getenv("ENSURE_FD");
+	if (p){
+		sendfd = strtol(p, NULL, 0);
+		fprintf(stderr,"Ensure: Using fd %d!\n",sendfd);
+		outfile = fdopen(sendfd, "w");
+	}
+
+	if (!outfile) {
+		fprintf(stderr,"Ensure: Warning using stdout!\n");
+		outfile = stdout;
+	}
 	fprintf(outfile,"ensure init\n");
 
 	return;
