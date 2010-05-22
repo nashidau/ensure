@@ -1,4 +1,6 @@
 .*.swp
 *.o
 ensure
+cscope.out
+tags
 libensure.so.0
