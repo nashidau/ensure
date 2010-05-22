@@ -5,7 +5,7 @@ enum ensure_severity {
 	ENSURE_CRITICAL,
 	ENSURE_BUG,
 	ENSURE_BADFORM,
-	ENSURE_PEDANTRY,
+	ENSURE_PEDANTIC,
 	ENSURE_POLICY,
 	ENSURE_N_SEVERITIES,
 };
@@ -24,3 +24,4 @@ struct assurance {
 
 int enasn_load(const char *);
 int enasn_check(void);
+void enasn_display_bugs(void *data, Evas_Object *obj, void *event);

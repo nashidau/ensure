@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <dirent.h>
 #include <dlfcn.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <sys/types.h>
 
@@ -12,6 +13,27 @@
 #include "enasn.h"
 #include "ensure.h"
 #include "enobj.h"
+
+static void bug_del(const void *, Evas_Object *obj);
+static char *bug_label_get(const void *data, Evas_Object *, const char *);
+static Evas_Object *bug_icon_get(const void *data, Evas_Object *, const char *);
+static Eina_Bool bug_state_get(const void *data, Evas_Object *, const char *);
+
+struct bug {
+	enum ensure_severity severity;
+	const char *desc;
+};
+
+static const Elm_Genlist_Item_Class bugc = {
+	.item_style = "default",
+	.func = {
+		.label_get = bug_label_get,
+		.icon_get = bug_icon_get,
+		.state_get = bug_state_get,
+		.del = bug_del
+	}
+};
+
 
 int
 enasn_load(const char *path){
@@ -73,9 +95,11 @@ enasn_load(const char *path){
 
 
 
-int ensure_bug(struct enobj *enobj, enum ensure_severity sev,
+int
+ensure_bug(struct enobj *enobj, enum ensure_severity sev,
 		const char *fmt, ...){
 	char *buf;
+	struct bug *bug;
 	int len;
 	va_list ap;
 	assert(enobj);
@@ -96,7 +120,55 @@ int ensure_bug(struct enobj *enobj, enum ensure_severity sev,
 	vsnprintf(buf,len,fmt,ap);
 	va_end(ap);
 
-	printf("Adding error %s\n",buf);
+	bug = calloc(1,sizeof(struct bug));
+	bug->severity = sev;
+	bug->desc = buf;
+
+	enobj->bugs = eina_list_prepend(enobj->bugs, bug);
+
+	if (!enobj->genitem){
+		ensure_enobj_err_list_add(enobj);
+	}
 
 	return 0;
+}
+
+void
+enasn_display_bugs(void *data, Evas_Object *obj ensure_unused, void *event){
+	Eina_List *l;
+	Elm_Genlist_Item *it = event;
+	Evas_Object *gl = elm_genlist_item_genlist_get(it);
+	struct bug *bug;
+	const struct enobj *enobj = elm_genlist_item_data_get(it);
+printf("Display bugs\n");
+	EINA_LIST_FOREACH(enobj->bugs, l, bug){
+		elm_genlist_item_append(gl, &bugc, bug,
+				enobj->genitem,
+				ELM_GENLIST_ITEM_NONE,
+				NULL, NULL); /* No selection */
+	}
+}
+
+
+
+static void
+bug_del(const void *data ensure_unused, Evas_Object *obj ensure_unused){
+
+}
+static char *
+bug_label_get(const void *data, Evas_Object *obj ensure_unused,
+		const char *part ensure_unused){
+	const struct bug *bug = data;
+	return strdup(bug->desc);
+}
+static Evas_Object *
+bug_icon_get(const void *data ensure_unused, Evas_Object *obj ensure_unused,
+		const char *part ensure_unused){
+	/* FIXME: Severity icon would be good */
+	return NULL;
+}
+static Eina_Bool
+bug_state_get(const void *data ensure_unused, Evas_Object *obj ensure_unused,
+		const char *part ensure_unused){
+	return false;
 }

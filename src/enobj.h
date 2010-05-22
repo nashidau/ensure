@@ -9,6 +9,12 @@ struct enobj {
 	/** ID of object (its address normally) */
 	uintptr_t	id;
 
+	/** Name: Optional */
+	char *name;
+
+	/** Type of object */
+	char *type;
+
 	/** ID of parent */
 	uintptr_t	parent;
 
@@ -22,6 +28,7 @@ struct enobj {
 	unsigned char r,g,b,a;
 
 	Elm_Genlist_Item *genitem;
+	Eina_List *bugs;
 
 	struct {
 		struct enobj *parent,*clip;

@@ -8,8 +8,11 @@ OBJECTS=			\
 		enasn.o		\
 		enobj.o
 
-ASSURANCES=			\
-		assurances/premul.asn	
+ASSURANCES=					\
+		assurances/negativesize.asn	\
+		assurances/premul.asn		\
+		assurances/zeroalpha.asn	\
+		assurances/zerosize.asn	
 
 TARGET=ensure
 LIBTARGET=libensure.so.0
@@ -30,5 +33,5 @@ scan: clean
 	scan-build make -j 4
 
 clean:
-	rm -rf ${TARGET} *.o core
+	rm -rf ${TARGET} *.o core ${ASSURANCES}
 
