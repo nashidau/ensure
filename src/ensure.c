@@ -12,7 +12,9 @@
 #include <Eina.h>
 #include <Elementary.h>
 
-#define ensure_unused	__attribute__((unused))
+#include "enobj.h"
+#include "enasn.h"
+#include "ensure.h"
 
 struct error {
 	const char *msg;
@@ -23,27 +25,7 @@ struct error {
 //};
 
 
-struct enobj {
-	/** ID of object (its address normally) */
-	uintptr_t	id;
 
-	/** ID of parent */
-	uintptr_t	parent;
-
-	/** ID of clip */
-	uintptr_t	clip;
-
-	/** Geo */
-	int x,y,w,h;
-
-	/** Colour */
-	unsigned char r,g,b,a;
-
-
-	struct {
-		struct enobj *parent,*clip;
-	} cache;
-};
 
 
 Evas_Object *window_add(char **argv);
@@ -70,7 +52,6 @@ static int parse_color(struct enobj *eno, const char *prefix, char **linep);
 static int parse_image(struct enobj *eno, const char *prefix, char **linep);
 static int parse_text(struct enobj *eno, const char *prefix, char **linep);
 
-static void enobj_free(void *enobj);
 
 static const struct parser {
 	const char *prefix;
@@ -90,7 +71,6 @@ static const struct parser {
 static Evas_Object *runbutton;
 static Evas_Object *checkbutton;
 static pid_t childid;
-static Eina_Hash *objdb;
 
 
 
@@ -107,6 +87,7 @@ elm_main(int argc, char **argv){
 
 	signal_init();
 
+	enasn_load("assurances");
 
         elm_list_go(win);
         elm_run();
@@ -299,10 +280,7 @@ select_cb(void *data ensure_unused, Evas_Object *obj ensure_unused, void *event)
 }
 
 
-static void
-enobj_free(void *enobj){
-	printf("Free! %p\n",enobj);
-}
+
 
 /*
  * Child data received: Hopefully an object
@@ -355,6 +333,9 @@ parse_line(char *line){
 	if (strncmp(line,"Object", 6) == 0){
 		printf("Got object\n");
 		parse_object(line,NULL);
+	} else if (strncmp(line, "Ensure done",11) == 0){
+		printf("Got to the end...\n");
+		enasn_check();
 	} else {
 		printf("Line was nothing...'%s'\n",line);
 	}
@@ -368,8 +349,6 @@ parse_object(char *line, struct enobj *eno){
 	if (eno == NULL){
 		eno = calloc(1,sizeof(struct enobj));
 
-		if (objdb == NULL)
-			objdb = eina_hash_pointer_new(enobj_free);
 		assert(eno);
 	}
 
@@ -395,7 +374,7 @@ parse_object(char *line, struct enobj *eno){
 	}
 
 	assert(eno->id);
-	eina_hash_add(objdb, eno->id, eno);
+	enobj_add(eno);
 
 	return 0;
 
@@ -471,11 +450,11 @@ parse_color(struct enobj *eno, const char *prefix, char **linep){
 }
 static int
 parse_image(struct enobj *eno, const char *prefix, char **linep){
-	*linep ++;
+	//*linep ++;
 	return 0;
 }
 static int
 parse_text(struct enobj *eno, const char *prefix, char **linep){
-	*linep ++;
+	//*linep ++;
 	return 0;
 }

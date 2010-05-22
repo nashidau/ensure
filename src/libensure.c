@@ -86,6 +86,7 @@ libensure_dump(void *data ensure_unused, Ecore_Fd_Handler *fdh){
 	}
 
 	fprintf(outfile,"Ensure done\n");
+	fflush(outfile);
 
 	return 1;
 }
