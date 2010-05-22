@@ -7,22 +7,17 @@
 
 
 #include <Eina.h>
+#include <Elementary.h>
 
 #include "enasn.h"
 #include "ensure.h"
 #include "enobj.h"
 
-struct enasn {
-	void *dlh;
-	struct assurance *asn;
-};
-
-static Eina_List *asns;
-
 int
 enasn_load(const char *path){
 	struct dirent *de;
-	struct enasn *enasn;
+	struct assurance *asn;
+	void *dlh;
 	int err;
 	char *p;
 	DIR *dir;
@@ -41,64 +36,42 @@ enasn_load(const char *path){
 		printf("Found: %s\n",de->d_name);
 
 		snprintf(buf,sizeof(buf),"%s/%s",path,de->d_name);
-		enasn = calloc(1,sizeof(struct enasn));
-		enasn->dlh = dlopen(buf,RTLD_NOW|RTLD_LOCAL);
-		if (!enasn->dlh){
+		dlh = dlopen(buf,RTLD_NOW|RTLD_LOCAL);
+		if (!dlh){
 			printf("Unable to open %s\n",buf);
-			free(enasn);
 			continue;
 		}
-		enasn->asn = dlsym(enasn->dlh,"assurance");
+		asn = dlsym(dlh,"assurance");
 		/* Check for sanity on the assurance */
 		err = 0;
-		if (!enasn->asn){
+		if (!asn){
 			printf("Unable to find 'assurance' in %s (%s)\n",buf,
 					dlerror());
 			err++;
-		} else if (enasn->asn->summary == NULL){
+		} else if (asn->summary == NULL){
 			printf("Need summary in assurance '%s'\n",buf);
 			err ++;
-		} else if (!enasn->asn->object && !enasn->asn->init &&
-					!enasn->asn->fini){
+		} else if (!asn->object && !asn->init && !asn->fini){
 			printf("Need at least one function!\n");
 			err++;
 		}
 
 		if (err){
-			dlclose(enasn->dlh);
-			free(enasn);
+			dlclose(dlh);
+			free(asn);
 			continue;
 		}
-		asns = eina_list_prepend(asns, enasn);
 
-		printf("Loaded %s\n",enasn->asn->summary);
+		ensure_assurance_add(asn);
+
+		printf("Loaded %s\n",asn->summary);
 	}
 
 	return 0;
 
 }
 
-static Eina_Bool
-check_obj(const Eina_Hash *hash ensure_unused, const void *key ensure_unused,
-		void *data, void *fdata ensure_unused){
-	struct enobj *enobj = data;
-	Eina_List *l;
-	struct enasn *ea;
-	assert(enobj->magic == ENOBJMAGIC);
 
-	EINA_LIST_FOREACH(asns, l, ea){
-		if (ea->asn->object)
-			ea->asn->object(NULL, enobj, NULL);
-	}
-	return 1;
-}
-
-
-int
-enasn_check(void){
-	eina_hash_foreach(objdb, check_obj, NULL);
-	return 1;
-}
 
 int ensure_bug(struct enobj *enobj, enum ensure_severity sev,
 		const char *fmt, ...){

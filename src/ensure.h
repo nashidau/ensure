@@ -5,6 +5,14 @@
 
 enum ensure_severity;
 struct enobj;
+struct enasn;
+
+struct ensure {
+	Evas_Object *config;
+	Evas_Object *bugs;
+};
+
+int ensure_assurance_add(struct assurance *);
 
 /* report a bug */
 int ensure_bug(struct enobj *enobj, enum ensure_severity sev,

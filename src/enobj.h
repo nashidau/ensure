@@ -4,7 +4,6 @@
 #endif
 
 struct enobj {
-
 	int	magic;
 
 	/** ID of object (its address normally) */
@@ -22,6 +21,7 @@ struct enobj {
 	/** Colour */
 	unsigned char r,g,b,a;
 
+	Elm_Genlist_Item *genitem;
 
 	struct {
 		struct enobj *parent,*clip;

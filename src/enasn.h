@@ -6,6 +6,8 @@ enum ensure_severity {
 	ENSURE_BUG,
 	ENSURE_BADFORM,
 	ENSURE_PEDANTRY,
+	ENSURE_POLICY,
+	ENSURE_N_SEVERITIES,
 };
 
 

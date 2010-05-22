@@ -20,9 +20,33 @@ struct error {
 	const char *msg;
 };
 
-//enum entype {
-//	ENTYPE_
-//};
+struct asninfo {
+	bool enabled;
+	struct assurance *asn;
+};
+
+struct severityinfo {
+	const char *name;
+	const char *icon;
+	Elm_Genlist_Item *item;
+	Eina_List *asninfo;
+} severity[] = {
+	[ENSURE_CRITICAL] = {
+		.name = "Critical",
+	},
+	[ENSURE_BUG] = {
+		.name = "Bug",
+	},
+	[ENSURE_BADFORM] = {
+		.name = "Bad Form",
+	},
+	[ENSURE_POLICY] = {
+		.name = "Local Policy",
+	},
+	[ENSURE_PEDANTRY] = {
+		.name = "Pedantry",
+	}
+};
 
 
 
@@ -34,6 +58,7 @@ static void select_cb(void *data, Evas_Object *obj, void *event);
 
 static void on_run(void *data, Evas_Object *button, void *event_info);
 static void on_check(void *data, Evas_Object *button, void *event_info);
+static void on_switch_config(void *data, Evas_Object *button, void *event_info);
 
 static int child_data(void *data, Ecore_Fd_Handler *hdlr);
 static void parse_line(char *line);
@@ -51,6 +76,27 @@ static int parse_geo(struct enobj *eno, const char *prefix, char **linep);
 static int parse_color(struct enobj *eno, const char *prefix, char **linep);
 static int parse_image(struct enobj *eno, const char *prefix, char **linep);
 static int parse_text(struct enobj *eno, const char *prefix, char **linep);
+
+static void config_add_classes(Evas_Object *gl);
+static void cfg_sel(void *data, Evas_Object *obj, void *event);
+static void cfg_exp(void *data, Evas_Object *obj, void *event);
+static void cfg_con(void *data, Evas_Object *obj, void *event);
+static void cfg_exp_req(void *data, Evas_Object *obj, void *event);
+static void cfg_con_req(void *data, Evas_Object *obj, void *event);
+
+
+static char *cfg_label_get(const void *, Evas_Object *, const char *part);
+static Evas_Object *cfg_icon_get(const void *, Evas_Object *, const char *part);
+static Eina_Bool cfg_state_get(const void *, Evas_Object *, const char *part);
+static void cfg_del(const void *, Evas_Object *obj);
+
+static char *asn_label_get(const void *data, Evas_Object *, const char *);
+static Evas_Object *asn_icon_get(const void *data, Evas_Object *, const char *);
+static Eina_Bool asn_state_get(const void *data, Evas_Object *, const char *);
+static void asn_del(const void *data, Evas_Object *obj);
+static void asn_select(void *data, Evas_Object *obj, void *event);
+static void asn_select_toggle(void *data, Evas_Object *obj, void *event);
+
 
 
 static const struct parser {
@@ -71,8 +117,6 @@ static const struct parser {
 static Evas_Object *runbutton;
 static Evas_Object *checkbutton;
 static pid_t childid;
-
-
 
 
 int
@@ -100,28 +144,50 @@ ELM_MAIN()
 
 Evas_Object *
 window_add(char **args){
-        Evas_Object *win,*bg,*li,*bx,*ctrls, *run, *check;
+        Evas_Object *win,*bg,*bx,*ctrls,*run,*check,*gl,*gl2,*config,*flip;
 
         win = elm_win_add(NULL, "Ensure", ELM_WIN_BASIC);
         elm_win_title_set(win, "Ensure");
         //evas_object_smart_callback_add(win,"delete,request", win_del,NULL);
 
         bg = elm_bg_add(win);
-        evas_object_size_hint_weight_set(bg,1,1);
         elm_win_resize_object_add(win, bg);
+        evas_object_size_hint_weight_set(bg,EVAS_HINT_EXPAND,EVAS_HINT_EXPAND);
         evas_object_show(bg);
 
         bx = elm_box_add(win);
-        evas_object_size_hint_weight_set(bx, 1.0, 1.0);
-	elm_win_resize_object_add(win, bg);
-        evas_object_show(bg);
+        evas_object_size_hint_weight_set(bx, EVAS_HINT_EXPAND,EVAS_HINT_EXPAND);
+	elm_win_resize_object_add(win, bx);
+        evas_object_show(bx);
 
-        ctrls = elm_box_add(bx);
+	flip = elm_flip_add(win);
+	evas_object_size_hint_align_set(flip, EVAS_HINT_FILL, EVAS_HINT_FILL);
+	evas_object_size_hint_weight_set(flip, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+	elm_box_pack_end(bx, flip);
+
+	gl = elm_genlist_add(win);
+	elm_genlist_always_select_mode_set(gl, true);
+	evas_object_size_hint_align_set(gl, EVAS_HINT_FILL, EVAS_HINT_FILL);
+	evas_object_size_hint_weight_set(gl, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+	config_add_classes(gl);
+	evas_object_show(gl);
+	elm_flip_content_back_set(flip, gl);
+
+	ctrls = elm_box_add(win);
 	elm_box_horizontal_set(ctrls, true);
-        evas_object_size_hint_weight_set(ctrls, 1.0, 0.0);
-        evas_object_show(ctrls);
+        evas_object_size_hint_weight_set(ctrls, EVAS_HINT_EXPAND, 0);
+        evas_object_size_hint_align_set(ctrls, EVAS_HINT_FILL, EVAS_HINT_FILL);
+
 
 	/* Buttons: Main event is the 'clicked' event */
+	config = elm_button_add(ctrls);
+	elm_button_label_set(config, "Config");
+	elm_button_autorepeat_set(config, false);
+	elm_box_pack_start(ctrls, config);
+	evas_object_show(config);
+	evas_object_smart_callback_add(config, "clicked", on_switch_config,
+			flip);
+
 	run = elm_button_add(ctrls);
 	elm_button_label_set(run, "Run");
 	elm_button_autorepeat_set(run, false);
@@ -139,18 +205,172 @@ window_add(char **args){
 	evas_object_smart_callback_add(check, "clicked", on_check, NULL);
 	checkbutton = check;
 
-        li = elm_list_add(bx);
-        evas_object_size_hint_weight_set(li, 1, 1);
-        evas_object_size_hint_align_set(li, -1, -1);
-        elm_box_pack_end(bx, li);
-        evas_object_show(li);
+	elm_box_pack_end(bx, ctrls);
+	evas_object_show(ctrls);
+
+
 
 evas_object_resize(win, 300, 300);
 evas_object_show(win);
         /* Urh.. the list widget for now */
-        return li;
+        return gl;
 
 }
+
+static const Elm_Genlist_Item_Class clc = {
+	.item_style = "default",
+	.func = {
+		.label_get = cfg_label_get,
+		.icon_get = cfg_icon_get,
+		.state_get = cfg_state_get,
+		.del = cfg_del,
+	},
+};
+static const Elm_Genlist_Item_Class asnclass = {
+	.item_style = "default",
+	.func = {
+		.label_get = asn_label_get,
+		.icon_get = asn_icon_get,
+		.state_get = asn_state_get,
+		.del = asn_del
+	},
+};
+
+static void
+config_add_classes(Evas_Object *gl){
+	int i;
+	for (i = 0 ; i < ENSURE_N_SEVERITIES ; i ++){
+		printf("Add %s\n",severity[i].name);
+		severity[i].item = elm_genlist_item_append(gl,&clc,
+				severity + i,
+				NULL, /* No parent */
+				ELM_GENLIST_ITEM_SUBITEMS,
+				cfg_sel,
+				severity + i /* data */);
+
+	}
+
+	evas_object_smart_callback_add(gl, "expand,request", cfg_exp_req, gl);
+	evas_object_smart_callback_add(gl, "contract,request", cfg_con_req, gl);
+	evas_object_smart_callback_add(gl, "expanded", cfg_exp, gl);
+	evas_object_smart_callback_add(gl, "contracted", cfg_con, gl);
+
+}
+
+static void
+cfg_sel(void *data, Evas_Object *obj ensure_unused, void *event ensure_unused){
+	const struct severityinfo *info = data;
+
+	printf("Item selected! %s\n",info->name);
+}
+static void
+cfg_exp(void *data, Evas_Object *obj, void *event){
+	Elm_Genlist_Item *parent = event;
+	Evas_Object *gl = elm_genlist_item_genlist_get(parent);
+	struct severityinfo *sev;
+	struct asninfo *ai;
+	Eina_List *l;
+
+
+	sev = (struct severityinfo *)elm_genlist_item_data_get(parent);
+
+	EINA_LIST_FOREACH(sev->asninfo, l, ai){
+		elm_genlist_item_append(gl, &asnclass,
+				ai, parent,
+				ELM_GENLIST_ITEM_NONE,
+				asn_select, ai);
+	}
+
+}
+static void
+cfg_con(void *data, Evas_Object *obj, void *event){
+	Elm_Genlist_Item *it = event;
+	elm_genlist_item_subitems_clear(it);
+}
+static void 
+cfg_exp_req(void *data, Evas_Object *obj, void *event){
+	Elm_Genlist_Item *it = event;
+	printf("Expand request!\n");
+	elm_genlist_item_expanded_set(it, 1);
+}
+static void cfg_con_req(void *data, Evas_Object *obj, void *event){
+   Elm_Genlist_Item *it = event;
+   elm_genlist_item_expanded_set(it, 0);
+}
+static void cfg_del(const void *data, Evas_Object *obj){
+
+}
+
+
+static char *
+cfg_label_get(const void *data, Evas_Object *obj, const char *part){
+	const struct severityinfo *info;
+
+	info = data;
+	return strdup(info->name);
+}
+static Evas_Object *
+cfg_icon_get(const void *data, Evas_Object *obj, const char *part){
+	return NULL;
+}
+static Eina_Bool
+cfg_state_get(const void *data, Evas_Object *obj, const char *part){
+	return false;
+}
+
+/** Handlers for the subitems in the assurance list */
+static char *
+asn_label_get(const void *data, Evas_Object *obj ensure_unused,
+		const char *part ensure_unused){
+	const struct asninfo *info;
+
+	info = data;
+	return strdup(info->asn->summary);
+}
+
+static Evas_Object *
+asn_icon_get(const void *data, Evas_Object *obj, const char *part){
+	const struct asninfo *ai = data;
+	Evas_Object *ck;
+
+	if (strcmp(part, "elm.swallow.end") == 0){
+		ck = elm_check_add(obj);
+		evas_object_show(ck);
+		elm_check_state_set(ck, ai->enabled);
+		evas_object_smart_callback_add(ck, "changed",
+				asn_select_toggle, ai);
+		return ck;
+	}
+
+	return NULL;
+}
+static Eina_Bool
+asn_state_get(const void *data, Evas_Object *obj ensure_unused,
+		const char *part ensure_unused){
+	const struct asninfo *ai;
+
+	ai = data;
+	return ai->enabled;
+}
+static void
+asn_del(const void *data ensure_unused, Evas_Object *obj ensure_unused){
+	/* FIXME: REmove  item ref */
+}
+
+static void
+asn_select(void *data, Evas_Object *obj ensure_unused, void *event ensure_unused){
+	struct asninfo *info = data;
+
+	info->enabled = !info->enabled;
+}
+
+static void
+asn_select_toggle(void *data, Evas_Object *obj, void *event){
+	struct asninfo *ai = data;
+
+	ai->enabled = elm_check_state_get(obj);
+}
+
 
 /**
  * Initialise our signal handler
@@ -189,6 +409,22 @@ signalfd_child(void *data ensure_unused, Ecore_Fd_Handler *fdh){
 
 
 
+
+static void
+on_switch_config(void *data, Evas_Object *button, void *event_info){
+	Evas_Object *flip = data;
+	bool state;
+
+	state = elm_flip_front_get(flip);
+	if (state){
+		/* Front currently: Change to back */
+		elm_button_label_set(button, "Report");
+	} else {
+		elm_button_label_set(button, "Config");
+	}
+
+	elm_flip_go(flip, ELM_FLIP_ROTATE_Y_CENTER_AXIS);
+}
 
 
 /**
@@ -457,4 +693,53 @@ static int
 parse_text(struct enobj *eno, const char *prefix, char **linep){
 	//*linep ++;
 	return 0;
+}
+
+
+
+
+int
+ensure_assurance_add(struct assurance *enasn){
+	struct asninfo *info;
+
+	assert((int)enasn->severity >= 0);
+	assert(enasn->severity < ENSURE_N_SEVERITIES);
+	/* FIXME: Do check! 
+	if ((int)enasn->severity < 0 && enasn->severity >= ENSURE_N_SEVERITIES){
+		return -1;
+	}*/
+
+	info = calloc(1,sizeof(struct asninfo));
+	info->enabled = true;
+	info->asn = enasn;
+	severity[enasn->severity].asninfo = eina_list_append(
+			severity[enasn->severity].asninfo, info);
+
+	return 0;
+}
+
+
+static Eina_Bool
+check_obj(const Eina_Hash *hash ensure_unused, const void *key ensure_unused,
+		void *data, void *fdata ensure_unused){
+	struct enobj *enobj = data;
+	Eina_List *l;
+	struct asninfo *ai;
+	int i;
+	assert(enobj->magic == ENOBJMAGIC);
+
+	for (i = 0 ; i < ENSURE_N_SEVERITIES ; i ++){
+		EINA_LIST_FOREACH(severity->asninfo, l, ai){
+			if (ai->asn->object)
+				ai->asn->object(NULL, enobj, NULL);
+		}
+	}
+	return 1;
+}
+
+
+int
+enasn_check(void){
+	eina_hash_foreach(objdb, check_obj, NULL);
+	return 1;
 }
