@@ -28,8 +28,18 @@ struct enobj {
 	unsigned char r,g,b,a;
 
 	/** Files */
-	const char *file;
-	const char *key;
+	union {
+		struct {
+			char *text;
+			const char *font;
+			const char *source;
+			int size;
+		} text;
+		struct {
+			const char *file;
+			const char *key;
+		} image;
+	} data;
 
 	Elm_Genlist_Item *genitem;
 	Eina_List *bugs;

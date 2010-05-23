@@ -18,6 +18,7 @@
 #include "parser.h"
 
 
+static char *parse_string(char **p, bool shared);
 
 static int parse_object(char *line, struct enobj *eno);
 static void parse_line(char *line);
@@ -29,6 +30,8 @@ static int parse_geo(struct enobj *eno, const char *prefix, char **linep);
 static int parse_color(struct enobj *eno, const char *prefix, char **linep);
 static int parse_image(struct enobj *eno, const char *prefix, char **linep);
 static int parse_text(struct enobj *eno, const char *prefix, char **linep);
+static int parse_font(struct enobj *eno, const char *prefix, char **linep);
+static int parse_source(struct enobj *eno, const char *prefix, char **linep);
 
 
 
@@ -44,6 +47,9 @@ static const struct parser {
 	{ "Color",	parse_color },
 	{ "Image:",	parse_image },
 	{ "Text:",	parse_text },
+	{ "Font:",	parse_font },
+	{ "FontSource:",parse_source },
+
 };
 #define N_PARSERS ((int)(sizeof(parsers)/sizeof(parsers[0])))
 
@@ -87,7 +93,6 @@ child_data(void *data ensure_unused, Ecore_Fd_Handler *hdlr){
 		/* Need to buffer some */
 		memmove(buf, start, p - start);
 		buffered = p - start;
-		printf("Buffering: %s\n",start);
 	}
 
 	return 1;
@@ -96,7 +101,6 @@ child_data(void *data ensure_unused, Ecore_Fd_Handler *hdlr){
 static void
 parse_line(char *line){
 	if (strncmp(line,"Object", 6) == 0){
-		printf("Got object\n");
 		parse_object(line,NULL);
 	} else if (strncmp(line, "Ensure done",11) == 0){
 		printf("Got to the end...\n");
@@ -165,8 +169,6 @@ parse_objid(struct enobj *eno, const char *prefix, char **linep){
 
 	/* FIXME: Check it parsed okay: Need safe strtol */
 
-	/* FIXME: Insert into objdb */
-
 	*linep = p;
 	return 0;
 }
@@ -232,13 +234,60 @@ parse_color(struct enobj *eno, const char *prefix, char **linep){
 	return 0;
 }
 static int
-parse_image(struct enobj *eno, const char *prefix, char **linep){
-	//*linep ++;
+parse_image(struct enobj *eno, const char *prefix ensure_unused, char **linep){
+	char *p;
+	eno->data.image.file = parse_string(linep,true);
+	p = *linep;
+	while (isspace(*p)) p ++;
+	if (*p == '\'')
+		eno->data.image.key = parse_string(linep,true);
+
 	return 0;
 }
 static int
-parse_text(struct enobj *eno, const char *prefix, char **linep){
-	//*linep ++;
+parse_text(struct enobj *eno, const char *prefix ensure_unused, char **linep){
+	char *p,*start;
+
+	p = *linep;
+	while (*p != '[') p ++;
+	p ++; p ++;
+	start = p;
+	while (*p != ']') p ++;
+	eno->data.text.text = strndup(start, p - start);
+	p ++; p ++;
+
+	*linep = p;
 	return 0;
 }
 
+
+static int
+parse_font(struct enobj *eno, const char *prefix ensure_unused, char **linep){
+	eno->data.text.font =  parse_string(linep, true);
+	eno->data.text.size = strtol(*linep,linep,10);
+	return 0;
+}
+static int
+parse_source(struct enobj *eno, const char *prefix ensure_unused, char **linep){
+	eno->data.text.source = parse_string(linep,true);
+	return 0;
+}
+
+
+
+static char *
+parse_string(char **linep,bool shared){
+	char *p,*start;
+
+	p = *linep;
+	while (*p != '\'') p ++;
+	p ++;
+	start = p;
+	while (*p != '\'') p ++;
+	*linep = p + 1;
+
+	if (shared)
+		return (char*)eina_stringshare_add_length(start,p-start);
+	else
+		return strndup(start, p - start);
+}

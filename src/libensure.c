@@ -117,11 +117,17 @@ libensure_objdump(Evas_Object *o, Evas_Object *parent){
 		const char *file,*key;
 		evas_object_image_file_get(o,&file,&key);
 		if (key)
-			fprintf(outfile, "Image: '%s' (%s) ",file,key);
+			fprintf(outfile, "Image: '%s' '%s' ",file,key);
 		else
 			fprintf(outfile, "Image: '%s' ",file);
 	} else if (strcmp(type, "text") == 0){
+		int size;
+		const char *font;
 		fprintf(outfile,"Text: [[%s]] ",evas_object_text_text_get(o));
+		evas_object_text_font_get(o, &font,&size);
+		fprintf(outfile,"Font: '%s' %d ",font,size);
+		font = evas_object_text_font_source_get(o);
+		if (font) fprintf(outfile,"FontSource: '%s' %d ",font,size);
 	} else if (strcmp(type, "rectangle") == 0){
 
 	} else if (strcmp(type, "edje") == 0){
