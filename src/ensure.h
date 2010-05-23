@@ -8,9 +8,10 @@ struct enobj;
 struct enasn;
 struct assurance;
 
+
 struct ensure {
-	Evas_Object *config;
-	Evas_Object *bugs;
+	/* Size of target canvas */
+	int w,h;
 };
 
 int ensure_assurance_add(struct assurance *);

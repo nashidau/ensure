@@ -23,5 +23,5 @@ struct assurance {
 
 
 int enasn_load(const char *);
-int enasn_check(void);
+int enasn_check(struct ensure *);
 void enasn_display_bugs(void *data, Evas_Object *obj, void *event);

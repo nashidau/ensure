@@ -510,6 +510,7 @@ on_run(void *data, Evas_Object *button ensure_unused, void *event_info ensure_un
 	pid_t pid;
 	char **args = data;
 	int pipefd[2];
+	struct ensure *ensure;
 
 	elm_object_disabled_set(runbutton, true);
 	elm_object_disabled_set(checkbutton, false);
@@ -541,8 +542,9 @@ on_run(void *data, Evas_Object *button ensure_unused, void *event_info ensure_un
 	}
 
 	/* Watch the fd */
+	ensure = calloc(1,sizeof(struct ensure));
 	ecore_main_fd_handler_add(pipefd[0], ECORE_FD_READ, child_data,
-					NULL, NULL, NULL);
+					ensure, NULL, NULL);
 
 	return;
 }
@@ -604,7 +606,7 @@ ensure_assurance_add(struct assurance *enasn){
 
 static Eina_Bool
 check_obj(const Eina_Hash *hash ensure_unused, const void *key ensure_unused,
-		void *data, void *fdata ensure_unused){
+		void *data, void *ensure){
 	struct enobj *enobj = data;
 	Eina_List *l;
 	struct asninfo *ai;
@@ -614,7 +616,7 @@ check_obj(const Eina_Hash *hash ensure_unused, const void *key ensure_unused,
 	for (i = 0 ; i < ENSURE_N_SEVERITIES ; i ++){
 		EINA_LIST_FOREACH(severity[i].asninfo, l, ai){
 			if (ai->asn->object)
-				ai->asn->object(NULL, enobj, ai->data);
+				ai->asn->object(ensure, enobj, ai->data);
 		}
 	}
 
@@ -623,7 +625,7 @@ check_obj(const Eina_Hash *hash ensure_unused, const void *key ensure_unused,
 
 
 int
-enasn_check(void){
+enasn_check(struct ensure *ensure){
 	int i;
 	Eina_List *l;
 	struct asninfo *ai;
@@ -631,16 +633,16 @@ enasn_check(void){
 	for (i = 0 ; i < ENSURE_N_SEVERITIES ; i ++){
 		EINA_LIST_FOREACH(severity[i].asninfo, l, ai){
 			if (ai->asn->init)
-				ai->data = ai->asn->init(NULL);
+				ai->data = ai->asn->init(ensure);
 		}
 	}
 
-	eina_hash_foreach(objdb, check_obj, NULL);
+	eina_hash_foreach(objdb, check_obj, ensure);
 
 	for (i = 0 ; i < ENSURE_N_SEVERITIES ; i ++){
 		EINA_LIST_FOREACH(severity[i].asninfo, l, ai){
 			if (ai->asn->fini)
-				ai->asn->fini(NULL, ai->data);
+				ai->asn->fini(ensure, ai->data);
 			ai->data = NULL;
 		}
 	}

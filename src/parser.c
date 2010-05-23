@@ -21,7 +21,7 @@
 static char *parse_string(char **p, bool shared);
 
 static int parse_object(char *line, struct enobj *eno);
-static void parse_line(char *line);
+static void parse_line(struct ensure *ensure, char *line);
 
 static int parse_objid(struct enobj *eno, const char *prefix, char **linep);
 static int parse_name(struct enobj *eno, const char *prefix, char **linep);
@@ -57,8 +57,9 @@ static const struct parser {
  * Child data received: Hopefully an object
  */
 int
-child_data(void *data ensure_unused, Ecore_Fd_Handler *hdlr){
+child_data(void *data, Ecore_Fd_Handler *hdlr){
 	int fd;
+	struct ensure *ensure = data;
 	static char buf[BUFSIZ];
 	static int buffered;
 	char *p, *start;
@@ -85,7 +86,7 @@ child_data(void *data ensure_unused, Ecore_Fd_Handler *hdlr){
 		if (*p != '\n') continue;
 
 		*p = 0;
-		parse_line(start);
+		parse_line(ensure, start);
 		start = p + 1;
 	}
 
@@ -99,12 +100,17 @@ child_data(void *data ensure_unused, Ecore_Fd_Handler *hdlr){
 }
 
 static void
-parse_line(char *line){
+parse_line(struct ensure *ensure, char *line){
 	if (strncmp(line,"Object", 6) == 0){
 		parse_object(line,NULL);
 	} else if (strncmp(line, "Ensure done",11) == 0){
 		printf("Got to the end...\n");
-		enasn_check();
+		enasn_check(ensure);
+	} else if (strncmp(line, "E: ",3) == 0){
+		line += 3;
+		strtol(line,&line,0);
+		ensure->w = strtol(line,&line,0);
+		ensure->h = strtol(line,&line,0);
 	} else {
 		printf("Line was nothing...'%s'\n",line);
 	}

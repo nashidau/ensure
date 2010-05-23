@@ -75,8 +75,10 @@ libensure_dump(void *data ensure_unused, Ecore_Fd_Handler *fdh){
 
 	EINA_INLIST_FOREACH(ecore_evases, eew){
 		Evas *e;
+		int w,h;
 		e = ecore_evas_get((Ecore_Evas *)eew);
-		fprintf(outfile,"E: %p\n",e);
+		evas_output_size_get(e,&w,&h);
+		fprintf(outfile,"E: %p %d %d\n",e,w,h);
 		os = evas_objects_in_rectangle_get(e,SHRT_MIN, SHRT_MIN,
 				USHRT_MAX, USHRT_MAX, true, true);
 		EINA_LIST_FOREACH(os, ot, o){
