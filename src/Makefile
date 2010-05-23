@@ -11,8 +11,10 @@ OBJECTS=			\
 
 ASSURANCES=					\
 		assurances/emptytext.asn	\
+		assurances/largetext.asn	\
 		assurances/negativesize.asn	\
 		assurances/offscreen.asn	\
+		assurances/outofsmart.asn	\
 		assurances/premul.asn		\
 		assurances/smalltext.asn	\
 		assurances/trailingspace.asn	\
