@@ -13,7 +13,7 @@ struct assurance assurance = {
 
 
 static int
-premul_object_check(struct ensure *en, struct enobj *obj, void *data){
+premul_object_check(struct ensure *en ensure_unused, struct enobj *obj, void *data){
 	assert(obj);
 
 	if (obj->a < obj->r || obj->a < obj->g || obj->a < obj->b){

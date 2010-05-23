@@ -10,8 +10,10 @@ OBJECTS=			\
 		parser.o
 
 ASSURANCES=					\
+		assurances/offscreen.asn	\
 		assurances/negativesize.asn	\
 		assurances/premul.asn		\
+		assurances/trailingspace.asn	\
 		assurances/zeroalpha.asn	\
 		assurances/zerosize.asn	
 
@@ -32,6 +34,11 @@ libensure.so.0: libensure.c
 
 scan: clean
 	scan-build make -j 4
+
+.PHONY: tags
+tags:
+	ctags -R .
+	cscope -R -b
 
 clean:
 	rm -rf ${TARGET} *.o core ${ASSURANCES}

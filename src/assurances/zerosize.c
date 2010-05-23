@@ -11,10 +11,11 @@ struct assurance assurance = {
 
 
 static int
-object_check(struct ensure *en, struct enobj *obj, void *data){
+object_check(struct ensure *en ensure_unused, struct enobj *obj,
+		void *data ensure_unused){
 	assert(obj);
 
-	if (obj->w || obj->h) return 0;
+	if (obj->w && obj->h) return 0;
 
 	ensure_bug(obj, ENSURE_BADFORM, "Object has zero size");
 	return 1;
