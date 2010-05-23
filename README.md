@@ -37,9 +37,12 @@ Future Tools
    * Object clipped to a smart's clip, but not a member
    * Object not clipped to it's smart parrent (subtly different)
    * Object of size 0
+   * Objects of size 1x1: Probably default not resized
+   * Objects of size 32x32: Probably a smart object not resized
    * Object outside it's clip
    * Object outside of smart object
    * Smart clip's size != smart object's size
+   * Objects clipped to a smarts clip are also smart members
    * Scaled images
    * Text with unusual paramaters
 
