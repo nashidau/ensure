@@ -596,7 +596,7 @@ check_obj(const Eina_Hash *hash ensure_unused, const void *key ensure_unused,
 
 	for (i = 0 ; i < ENSURE_N_SEVERITIES ; i ++){
 		EINA_LIST_FOREACH(severity[i].asninfo, l, ai){
-			if (ai->asn->object)
+			if (ai->enabled && ai->asn->object)
 				ai->asn->object(ensure, enobj, ai->data);
 		}
 	}
@@ -613,7 +613,7 @@ enasn_check(struct ensure *ensure){
 
 	for (i = 0 ; i < ENSURE_N_SEVERITIES ; i ++){
 		EINA_LIST_FOREACH(severity[i].asninfo, l, ai){
-			if (ai->asn->init)
+			if (ai->enabled && ai->asn->init)
 				ai->data = ai->asn->init(ensure);
 		}
 	}
@@ -622,7 +622,7 @@ enasn_check(struct ensure *ensure){
 
 	for (i = 0 ; i < ENSURE_N_SEVERITIES ; i ++){
 		EINA_LIST_FOREACH(severity[i].asninfo, l, ai){
-			if (ai->asn->fini)
+			if (ai->enabled && ai->asn->fini)
 				ai->asn->fini(ensure, ai->data);
 			ai->data = NULL;
 		}
