@@ -113,6 +113,7 @@ static const struct parser {
 	{ "Object:",	parse_objid },
 	{ "Parent:",	parse_parent },
 	{ "Clip:",	parse_parent },
+	{ "Name:",	parse_name },
 	{ "Geometry:",  parse_geo },
 	{ "Color",	parse_color },
 	{ "Image:",	parse_image },
