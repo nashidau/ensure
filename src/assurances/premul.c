@@ -16,7 +16,6 @@ static int
 premul_object_check(struct ensure *en, struct enobj *obj, void *data){
 	assert(obj);
 
-	printf("%d vs %d,%d,%d\n",obj->a,obj->r,obj->g,obj->b);
 	if (obj->a < obj->r || obj->a < obj->g || obj->a < obj->b){
 		ensure_bug(obj,ENSURE_BUG,
 				"Alpha (%d) must be <= rgb values (%d,%d,%d)",
