@@ -108,7 +108,7 @@ parse_line(struct ensure *ensure, char *line){
 		enasn_check(ensure);
 	} else if (strncmp(line, "E: ",3) == 0){
 		line += 3;
-		strtol(line,&line,0);
+		strtoll(line,&line,0);
 		ensure->w = strtol(line,&line,0);
 		ensure->h = strtol(line,&line,0);
 	} else {
@@ -163,7 +163,7 @@ parse_objid(struct enobj *eno, const char *prefix, char **linep){
 	assert(eno);assert(prefix);assert(linep);
 	assert(eno->id == 0);
 
-	eno->id = strtol(*linep,&p,0);
+	eno->id = strtoll(*linep,&p,0);
 	p ++;
 	if (*p == '\''){
 		p ++;
@@ -204,7 +204,7 @@ parse_parent(struct enobj *eno, const char *prefix, char **linep){
 	assert(eno);assert(prefix);assert(linep);
 
 	/* FIXME: safe strtol */
-	id = strtol(*linep, &p, 0);
+	id = strtoll(*linep, &p, 0);
 
 	if (strncmp(prefix, "Parent",4) == 0){
 		eno->parent = id;
