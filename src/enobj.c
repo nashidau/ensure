@@ -53,7 +53,7 @@ enobj_clip_get(struct enobj *eno){
 struct enobj *
 enobj_get(uintptr_t id){
 	struct enobj *obj;
-	obj = eina_hash_find(objdb, (void *)id);
+	obj = eina_hash_find(objdb, &id);
 	assert(obj->magic == ENOBJMAGIC);
 	assert(id == obj->id);
 	return obj;
