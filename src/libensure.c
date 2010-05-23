@@ -101,6 +101,8 @@ libensure_objdump(Evas_Object *o, Evas_Object *parent){
 	type = evas_object_type_get(o);
 	fprintf(outfile,"Object: %p '%s' ",o,type);
 
+	type = evas_object_name_get(o);
+	if (type) fprintf(outfile, "Name: '%s' ",type);
 
 	if (parent) fprintf(outfile,"Parent: %p ",parent);
 	evas_object_geometry_get(o,&x,&y,&w,&h);

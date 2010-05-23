@@ -71,6 +71,7 @@ static int signalfd_child(void *data, Ecore_Fd_Handler *fd_handler);
 static int parse_object(char *line, struct enobj *eno);
 
 static int parse_objid(struct enobj *eno, const char *prefix, char **linep);
+static int parse_name(struct enobj *eno, const char *prefix, char **linep);
 static int parse_parent(struct enobj *eno, const char *prefix, char **linep);
 static int parse_geo(struct enobj *eno, const char *prefix, char **linep);
 static int parse_color(struct enobj *eno, const char *prefix, char **linep);
@@ -723,6 +724,23 @@ parse_objid(struct enobj *eno, const char *prefix, char **linep){
 	return 0;
 }
 
+static int
+parse_name(struct enobj *eno, const char *prefix, char **linep){
+	char *p,*start;
+
+	p = *linep;
+
+	while (*p != '\'') p ++;
+	p ++;
+	start = p;
+	while (*p != '\'') p ++;
+	eno->name = strndup(start,p-start);
+	p ++;
+
+	*linep = p;
+
+	return 0;
+}
 
 static int
 parse_parent(struct enobj *eno, const char *prefix, char **linep){
