@@ -23,6 +23,7 @@ struct error {
 
 struct asninfo {
 	bool enabled;
+	void *data;
 	struct assurance *asn;
 };
 
@@ -463,7 +464,7 @@ signalfd_child(void *data ensure_unused, Ecore_Fd_Handler *fdh){
 
 
 static void
-on_switch_config(void *data, Evas_Object *button, void *event_info ensure_unused){
+on_switch_config(void *data ensure_unused, Evas_Object *button, void *event_info ensure_unused){
 	bool state;
 
 	state = evas_object_visible_get(objlist);
@@ -613,15 +614,36 @@ check_obj(const Eina_Hash *hash ensure_unused, const void *key ensure_unused,
 	for (i = 0 ; i < ENSURE_N_SEVERITIES ; i ++){
 		EINA_LIST_FOREACH(severity[i].asninfo, l, ai){
 			if (ai->asn->object)
-				ai->asn->object(NULL, enobj, NULL);
+				ai->asn->object(NULL, enobj, ai->data);
 		}
 	}
+
 	return 1;
 }
 
 
 int
 enasn_check(void){
+	int i;
+	Eina_List *l;
+	struct asninfo *ai;
+
+	for (i = 0 ; i < ENSURE_N_SEVERITIES ; i ++){
+		EINA_LIST_FOREACH(severity[i].asninfo, l, ai){
+			if (ai->asn->init)
+				ai->data = ai->asn->init(NULL);
+		}
+	}
+
 	eina_hash_foreach(objdb, check_obj, NULL);
+
+	for (i = 0 ; i < ENSURE_N_SEVERITIES ; i ++){
+		EINA_LIST_FOREACH(severity[i].asninfo, l, ai){
+			if (ai->asn->fini)
+				ai->asn->fini(NULL, ai->data);
+			ai->data = NULL;
+		}
+	}
+
 	return 1;
 }

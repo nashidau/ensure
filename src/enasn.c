@@ -140,7 +140,7 @@ enasn_display_bugs(void *data, Evas_Object *obj ensure_unused, void *event){
 	Evas_Object *gl = elm_genlist_item_genlist_get(it);
 	struct bug *bug;
 	const struct enobj *enobj = elm_genlist_item_data_get(it);
-printf("Display bugs\n");
+
 	EINA_LIST_FOREACH(enobj->bugs, l, bug){
 		elm_genlist_item_append(gl, &bugc, bug,
 				enobj->genitem,
