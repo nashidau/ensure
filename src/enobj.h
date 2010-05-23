@@ -27,6 +27,10 @@ struct enobj {
 	/** Colour */
 	unsigned char r,g,b,a;
 
+	/** Files */
+	const char *file;
+	const char *key;
+
 	Elm_Genlist_Item *genitem;
 	Eina_List *bugs;
 

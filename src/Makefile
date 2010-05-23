@@ -6,7 +6,8 @@ LDFLAGS+=`pkg-config --libs ${PKGS}` -rdynamic -ldl
 OBJECTS=			\
 		ensure.o	\
 		enasn.o		\
-		enobj.o
+		enobj.o		\
+		parser.o
 
 ASSURANCES=					\
 		assurances/negativesize.asn	\
