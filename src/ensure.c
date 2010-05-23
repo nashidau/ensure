@@ -703,16 +703,17 @@ parse_object(char *line, struct enobj *eno){
 
 static int
 parse_objid(struct enobj *eno, const char *prefix, char **linep){
-	char *p;
+	char *p,*start;
 	assert(eno);assert(prefix);assert(linep);
 	assert(eno->id == 0);
 
 	eno->id = strtol(*linep,&p,0);
 	p ++;
 	if (*p == '\''){
-		/* FIXME: Ignoring type */
 		p ++;
+		start = p;
 		while (*p != '\'') p ++;
+		eno->type = eina_stringshare_add_length(start,p-start);
 		p ++;
 	}
 

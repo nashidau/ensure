@@ -13,7 +13,7 @@ struct enobj {
 	char *name;
 
 	/** Type of object */
-	char *type;
+	const char *type;
 
 	/** ID of parent */
 	uintptr_t	parent;
