@@ -56,8 +56,6 @@ struct severityinfo {
 
 Evas_Object *window_add(char **argv);
 
-static void select_cb(void *data, Evas_Object *obj, void *event);
-
 static void on_run(void *data, Evas_Object *button, void *event_info);
 static void on_check(void *data, Evas_Object *button, void *event_info);
 static void on_switch_config(void *data, Evas_Object *button, void *event_info);
@@ -563,23 +561,6 @@ dochild(char **args, int fd){
 	perror("execvp");
 	exit(7);
 }
-
-
-/* Signal handler for sig child */
-static void
-select_cb(void *data ensure_unused, Evas_Object *obj ensure_unused, void *event){
-        /* FIXME: We should use a peruse pointer here */
-        //Evas_Object *li = data;
-        Elm_List_Item *itm = event;
-        struct error *err;
-
-        err = elm_list_item_data_get(itm);
-}
-
-
-
-
-
 
 
 

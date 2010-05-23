@@ -4,8 +4,8 @@ static int object_check(struct ensure*,struct enobj*,void *data);
 static void *init_test(struct ensure*);
 
 struct assurance assurance = {
-	.summary = "Trailing spaces",
-	.description = "Check for trailing whitespace on text string.",
+	.summary = "Null/Empty text",
+	.description = "Check for blank/empty strings.",
 	.severity = ENSURE_PEDANTIC,
 	.init = init_test,
 	.object = object_check
@@ -23,17 +23,13 @@ init_test(struct ensure *en ensure_unused){
 static int
 object_check(struct ensure *en ensure_unused, struct enobj *obj,
 		void *data ensure_unused){
-	char *p;
 	assert(obj);
 
 	if (obj->type != texttype) return 0;
 
-	p = obj->data.text.text + strlen(obj->data.text.text);
-	p --;
-	if (isspace(*p)){
+	if (obj->data.text.text == NULL || strlen(obj->data.text.text) == 0){
 		ensure_bug(obj, ENSURE_PEDANTIC,
-				"Trailing whitespace (%02x) on text",
-				(unsigned int)*p);
+				"Empty text string,");
 		return 1;
 	}
 	return 0;

@@ -134,7 +134,8 @@ ensure_bug(struct enobj *enobj, enum ensure_severity sev,
 }
 
 void
-enasn_display_bugs(void *data, Evas_Object *obj ensure_unused, void *event){
+enasn_display_bugs(void *data ensure_unused, Evas_Object *obj ensure_unused,
+		void *event){
 	Eina_List *l;
 	Elm_Genlist_Item *it = event;
 	Evas_Object *gl = elm_genlist_item_genlist_get(it);

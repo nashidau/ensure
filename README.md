@@ -33,6 +33,7 @@ Currently checks for:
    * Text with trailing spaces
    * Object of negative size
    * Object off screen
+   * Empty text
 
 
 Future Tools
@@ -49,7 +50,6 @@ Future Tools
    * Objects clipped to a smarts clip are also smart members
    * Scaled images
    * Text with unusual paramaters
-   * Empty text
    * Font 5 pts or less
    * Font 100 pts of more
 

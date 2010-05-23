@@ -10,9 +10,11 @@ OBJECTS=			\
 		parser.o
 
 ASSURANCES=					\
-		assurances/offscreen.asn	\
+		assurances/emptytext.asn	\
 		assurances/negativesize.asn	\
+		assurances/offscreen.asn	\
 		assurances/premul.asn		\
+		assurances/smalltext.asn	\
 		assurances/trailingspace.asn	\
 		assurances/zeroalpha.asn	\
 		assurances/zerosize.asn	
