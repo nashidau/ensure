@@ -13,13 +13,15 @@ struct assurance assurance = {
 static int
 object_check(struct ensure *en ensure_unused, struct enobj *obj,
 		void *data ensure_unused){
-	struct enobj *parent;
-	struct enobj *clip, *clipp;
+	struct enobj *clip;
 	assert(obj);
 
 	if (!obj->clip) return 0;
 
+	clip = enobj_clip_get(obj);
+
 	if (!clip->parent) return 0;
+
 
 	if (!obj->parent || obj->parent != clip->parent){
 		ensure_bug(obj, assurance.severity,
