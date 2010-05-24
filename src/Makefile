@@ -4,8 +4,9 @@ CFLAGS+=`pkg-config --cflags ${PKGS}`
 LDFLAGS+=`pkg-config --libs ${PKGS}` -rdynamic -ldl
 
 OBJECTS=			\
-		ensure.o	\
+		display.o	\
 		enasn.o		\
+		ensure.o	\
 		enobj.o		\
 		parser.o
 

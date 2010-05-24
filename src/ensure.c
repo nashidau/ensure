@@ -16,6 +16,7 @@
 #include "enasn.h"
 #include "ensure.h"
 #include "parser.h"
+#include "display.h"
 
 struct error {
 	const char *msg;
@@ -101,23 +102,23 @@ static pid_t childid;
 Evas_Object *objlist;
 Evas_Object *configlist;
 Evas_Object *box;
+Evas_Object *mainwindow;
 
 
 int
 elm_main(int argc, char **argv){
-        Evas_Object *win;
 
         if (argc < 2){
                printf("Usage: %s <program>\n", argv[0]);
                 exit(0);
         }
-        win = window_add(argv);
+        mainwindow = window_add(argv);
 
 	signal_init();
 
 	enasn_load("assurances");
 
-        elm_list_go(win);
+        elm_list_go(mainwindow);
         elm_run();
         elm_shutdown();
         return 0;
@@ -147,7 +148,7 @@ window_add(char **args){
 
 	gl = elm_genlist_add(win);
 	configlist = gl;
-	elm_genlist_always_select_mode_set(gl, true);
+	elm_genlist_always_select_mode_set(gl, false);
 	evas_object_size_hint_align_set(gl, EVAS_HINT_FILL, EVAS_HINT_FILL);
 	evas_object_size_hint_weight_set(gl, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 	config_add_classes(gl);
@@ -392,8 +393,8 @@ ensure_enobj_err_list_add(struct enobj *enobj){
 }
 static void
 enobj_select(void *data ensure_unused, Evas_Object *obj ensure_unused,
-		void *event ensure_unused){
-	printf("FIXME: Show dialog about object here!\n");
+		void *itemv){
+	elm_genlist_item_expanded_set(itemv, true);
 }
 static char *
 enobj_label_get(const void *data, Evas_Object *obj ensure_unused,
@@ -411,8 +412,20 @@ enobj_label_get(const void *data, Evas_Object *obj ensure_unused,
 	return strdup(buf);
 }
 static Evas_Object *
-enobj_icon_get(const void *data ensure_unused, Evas_Object *obj ensure_unused,
-		const char *part ensure_unused){
+enobj_icon_get(const void *enobjv, Evas_Object *obj,
+		const char *part){
+	Evas_Object *bt;
+	if (strcmp(part, "elm.swallow.end") == 0){
+		bt = elm_button_add(obj);
+		elm_button_label_set(bt, "View");
+		elm_button_autorepeat_set(bt, false);
+		evas_object_show(bt);
+		evas_object_smart_callback_add(bt, "clicked",
+				display_enobj_cb, enobjv);
+		return bt;
+	}
+
+
 	return NULL;
 }
 static Eina_Bool

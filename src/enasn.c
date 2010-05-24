@@ -19,10 +19,6 @@ static char *bug_label_get(const void *data, Evas_Object *, const char *);
 static Evas_Object *bug_icon_get(const void *data, Evas_Object *, const char *);
 static Eina_Bool bug_state_get(const void *data, Evas_Object *, const char *);
 
-struct bug {
-	enum ensure_severity severity;
-	const char *desc;
-};
 
 static const Elm_Genlist_Item_Class bugc = {
 	.item_style = "default",

@@ -21,6 +21,10 @@ struct assurance {
 	int (*fini)(struct ensure *, void *data);
 };
 
+struct bug {
+	enum ensure_severity severity;
+	const char *desc;
+};
 
 int enasn_load(const char *);
 int enasn_check(struct ensure *);
