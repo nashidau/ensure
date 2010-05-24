@@ -52,7 +52,7 @@ object_check(struct ensure *en ensure_unused, struct enobj *obj,
 	/* Good idea to not test wrong object types */
 	if (obj->type != texttype) return 0;
 
-	if (obj->data.text.text && strstr(obj->data.text.text,"elvis") == 0){
+	if (obj->data.text.text && strstr(obj->data.text.text,"elvis")){
 		ensure_bug(obj, ENSURE_POLICY,
 				"String contains 'elvis': %s",
 				obj->data.text.text);
