@@ -33,22 +33,22 @@ Currently checks for:
    * Text with trailing spaces
    * Object of negative size
    * Object off screen
+   * Object outside it's clip
+   * Object & Clip are both smart members
    * Empty text
    * Font 5 pts or less
    * Font 100 pts of more
    * Object outside of smart object
+   * Object clipped to a smart's clip, but not a member
 
 
 Future Tools
 ------------
 
    * Image object has valid image file
-      * Object clipped to a smart's clip, but not a member
    * Object not clipped to it's smart parent (subtly different)
    * Objects of size 1x1: Probably default not resized
    * Objects of size 32x32: Probably a smart object not resized
-   * Object outside it's clip
    * Smart clip's size != smart object's size
-   * Objects clipped to a smarts clip are also smart members
    * Scaled images
 

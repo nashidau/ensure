@@ -11,10 +11,13 @@ OBJECTS=			\
 		parser.o
 
 ASSURANCES=					\
+		assurances/badclipsmart.asn	\
+		assurances/clippedsmart.asn	\
 		assurances/emptytext.asn	\
 		assurances/largetext.asn	\
 		assurances/negativesize.asn	\
 		assurances/offscreen.asn	\
+		assurances/outofclip.asn	\
 		assurances/outofsmart.asn	\
 		assurances/premul.asn		\
 		assurances/smalltext.asn	\
