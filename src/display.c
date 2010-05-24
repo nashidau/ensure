@@ -32,8 +32,6 @@ display_enobj_cb(void *enobjv, Evas_Object *obj ensure_unused,
 	assert(enobjv);
 	assert(enobj->magic == ENOBJMAGIC);
 
-	printf("Dispaly enobj callback\n");
-
 	if (enobj->name){
 		snprintf(buf,sizeof(buf), "%.*s (%llx - %s)",70,enobj->name,
 				(long long int)enobj->id, enobj->type);
@@ -94,17 +92,10 @@ display_enobj_cb(void *enobjv, Evas_Object *obj ensure_unused,
 		struct bug *bug;
 		add_heading(win,tbl,&pos,"Bugs");
 		EINA_LIST_FOREACH(enobj->bugs, l, bug){
-			printf("%s\n",sev_string(bug->severity));
 			add_text(win,tbl,&pos,sev_string(bug->severity),
 					bug->desc);
 		}
 	}
-
-	/* Todo:
-	 *	Text fields
-	 *	Image fields
-	 *	Bugs
-	 */
 
 	evas_object_show(win);
 
