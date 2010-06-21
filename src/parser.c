@@ -29,6 +29,7 @@ static int parse_parent(struct enobj *eno, const char *prefix, char **linep);
 static int parse_geo(struct enobj *eno, const char *prefix, char **linep);
 static int parse_color(struct enobj *eno, const char *prefix, char **linep);
 static int parse_image(struct enobj *eno, const char *prefix, char **linep);
+static int parse_image_err(struct enobj *eno, const char *prefix, char **linep);
 static int parse_text(struct enobj *eno, const char *prefix, char **linep);
 static int parse_font(struct enobj *eno, const char *prefix, char **linep);
 static int parse_source(struct enobj *eno, const char *prefix, char **linep);
@@ -48,6 +49,7 @@ static const struct parser {
 	{ "Geometry:",  parse_geo },
 	{ "Color",	parse_color },
 	{ "Image:",	parse_image },
+	{ "ImageErr:",	parse_image_err },
 	{ "Text:",	parse_text },
 	{ "Font:",	parse_font },
 	{ "FontSource:",parse_source },
@@ -254,6 +256,14 @@ parse_image(struct enobj *eno, const char *prefix ensure_unused, char **linep){
 
 	return 0;
 }
+
+static int
+parse_image_err(struct enobj *eno, const char *prefix ensure_unused,
+		char **linep){
+	eno->data.image.err = parse_string(linep,true);
+	return 0;
+}
+
 static int
 parse_text(struct enobj *eno, const char *prefix ensure_unused, char **linep){
 	char *p,*start;

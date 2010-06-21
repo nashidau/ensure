@@ -45,6 +45,7 @@ struct enobj {
 		struct {
 			const char *file;
 			const char *key;
+			const char *err;
 			const char *edjefile;
 			enum edjemember edjemember;
 		} image;

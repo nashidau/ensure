@@ -118,11 +118,17 @@ libensure_objdump(Evas_Object *o, Evas_Object *parent){
 	/* Type specific things here */
 	if (strcmp(type, "image") == 0){
 		const char *file,*key;
+		int err;
 		evas_object_image_file_get(o,&file,&key);
 		if (key)
 			fprintf(outfile, "Image: '%s' '%s' ",file,key);
 		else
 			fprintf(outfile, "Image: '%s' ",file);
+		err = evas_object_image_load_error_get(o);
+		if (err != EVAS_LOAD_ERROR_NONE){
+			fprintf(outfile, "ImageErr: '%s' ",
+					evas_load_error_str(err));
+		}
 	} else if (strcmp(type, "text") == 0){
 		int size;
 		const char *font;
