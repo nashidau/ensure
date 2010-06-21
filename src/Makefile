@@ -13,6 +13,7 @@ OBJECTS=			\
 ASSURANCES=					\
 		assurances/badclipsmart.asn	\
 		assurances/clippedsmart.asn	\
+		assurances/edjeerr.asn		\
 		assurances/emptytext.asn	\
 		assurances/largetext.asn	\
 		assurances/negativesize.asn	\
