@@ -21,35 +21,27 @@ struct enedj {
 
 
 
-typedef struct _Edje_File                            Edje_File;
-typedef struct _Edje_Image_Directory                 Edje_Image_Directory;
-typedef struct _Edje_Image_Directory_Entry           Edje_Image_Directory_Entry;
+typedef struct Edje_File                            Edje_File;
+typedef struct Edje_Image_Directory                 Edje_Image_Directory;
+typedef struct Edje_Image_Directory_Entry           Edje_Image_Directory_Entry;
 
 
-struct _Edje_File
-{
-   const char                     *path;
-   time_t                          mtime;
-
-   Edje_Image_Directory           *image_dir;
+struct Edje_File {
+	Edje_Image_Directory           *image_dir;
 };
 
-struct _Edje_Image_Directory
-{
-   Eina_List *entries; /* a list of Edje_Image_Directory_Entry */
+struct Edje_Image_Directory {
+	Eina_List *entries; /* a list of Edje_Image_Directory_Entry */
 };
 
-struct _Edje_Image_Directory_Entry
-{
-   char *entry; /* the nominal name of the image - if any */
-   int   id; /* the id no. of the image */
+struct Edje_Image_Directory_Entry {
+	char *entry; /* the nominal name of the image - if any */
+	int   id; /* the id no. of the image */
 };
 
 static const char *enedj_index_lookup(const struct enedj *enedj, const char *index);
 static int enedj_load(const char *filename);
 static int enedj_init(void);
-static void _edje_edd_init(void);
-
 
 
 static Eina_List *edjes;
@@ -58,9 +50,6 @@ static int edjeinit;
 static Eet_Data_Descriptor *_edje_edd_edje_file = NULL;
 static Eet_Data_Descriptor *_edje_edd_edje_image_directory = NULL;
 static Eet_Data_Descriptor *_edje_edd_edje_image_directory_entry = NULL;
-
-
-
 
 /**
  * Get the filename for a key.
@@ -71,7 +60,6 @@ enedj_get_imagename(const char *edjefile, const char *index){
 	struct enedj *enedj;
 
 	if (!edjefile || !index) return NULL;
-	printf("Lookup %s %s\n",edjefile, index);
 
 	EINA_LIST_FOREACH(edjes, l, enedj){
 		if (streq(enedj->file, edjefile)){
@@ -87,7 +75,6 @@ enedj_get_imagename(const char *edjefile, const char *index){
 			return enedj_index_lookup(enedj, index);
 		}
 	}
-printf("Ddidn't find it\n");
 	return NULL;
 }
 
@@ -97,8 +84,8 @@ enedj_index_lookup(const struct enedj *ensure_restrict enedj,
 			const char *ensure_restrict index){
 	long val;
 	assert(enedj); assert(index);
-printf("image %s\n",index);
-	/* FIXME: Better sanity checks */
+	if (!index || !enedj) return NULL;
+
 	if (*index == 'i'){
 		index = strchr(index, '/');
 		if (!index || !*(index + 1)) return NULL;
@@ -166,36 +153,30 @@ enedj_load(const char *filename){
 
 static int
 enedj_init(void){
+	Eet_Data_Descriptor_Class eddc;
 	if (edjeinit) return edjeinit;
 
 	edjeinit ++;
 
-	_edje_edd_init();
-
-	return 0;
-}
-
-
-static void
-_edje_edd_init(void)
-{
-   Eet_Data_Descriptor_Class eddc;
-
    /* image directory */
    EET_EINA_FILE_DATA_DESCRIPTOR_CLASS_SET(&eddc, Edje_Image_Directory_Entry);
-   _edje_edd_edje_image_directory_entry =
-     eet_data_descriptor_file_new(&eddc);
-   EET_DATA_DESCRIPTOR_ADD_BASIC(_edje_edd_edje_image_directory_entry, Edje_Image_Directory_Entry, "entry", entry, EET_T_STRING);
-   EET_DATA_DESCRIPTOR_ADD_BASIC(_edje_edd_edje_image_directory_entry, Edje_Image_Directory_Entry, "id", id, EET_T_INT);
+   _edje_edd_edje_image_directory_entry = eet_data_descriptor_file_new(&eddc);
+   EET_DATA_DESCRIPTOR_ADD_BASIC(_edje_edd_edje_image_directory_entry,
+		   Edje_Image_Directory_Entry, "entry", entry, EET_T_STRING);
+   EET_DATA_DESCRIPTOR_ADD_BASIC(_edje_edd_edje_image_directory_entry,
+		   Edje_Image_Directory_Entry, "id", id, EET_T_INT);
    EET_EINA_FILE_DATA_DESCRIPTOR_CLASS_SET(&eddc, Edje_Image_Directory);
-   _edje_edd_edje_image_directory =
-     eet_data_descriptor_file_new(&eddc);
-   EET_DATA_DESCRIPTOR_ADD_LIST(_edje_edd_edje_image_directory, Edje_Image_Directory, "entries", entries, _edje_edd_edje_image_directory_entry);
+   _edje_edd_edje_image_directory = eet_data_descriptor_file_new(&eddc);
+   EET_DATA_DESCRIPTOR_ADD_LIST(_edje_edd_edje_image_directory,
+		   Edje_Image_Directory, "entries", entries,
+		   _edje_edd_edje_image_directory_entry);
 
    /* the main file directory */
    EET_EINA_FILE_DATA_DESCRIPTOR_CLASS_SET(&eddc, Edje_File);
-   _edje_edd_edje_file =
-     eet_data_descriptor_file_new(&eddc);
-   EET_DATA_DESCRIPTOR_ADD_SUB(_edje_edd_edje_file, Edje_File, "image_dir", image_dir, _edje_edd_edje_image_directory);
+   _edje_edd_edje_file = eet_data_descriptor_file_new(&eddc);
+   EET_DATA_DESCRIPTOR_ADD_SUB(_edje_edd_edje_file, Edje_File, "image_dir",
+		   image_dir, _edje_edd_edje_image_directory);
+
+   return 0;
 }
 
