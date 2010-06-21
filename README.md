@@ -102,18 +102,20 @@ Future Work
 -----------
 
 More tests:
-   * Object not clipped to it's smart parent (subtly different)
-   * Objects of size 1x1: Probably default not resized
-   * Objects of size 32x32: Probably a smart object not resized
-   * Smart clip's size != smart object's size
-   * Scaled images
+
+  * Object not clipped to it's smart parent (subtly different)
+  * Objects of size 1x1: Probably default not resized
+  * Objects of size 32x32: Probably a smart object not resized
+  * Smart clip's size != smart object's size
+  * Scaled images
 
 Other:
-   * Allow multiple check runs in one test run
-   * Allow signaling through other means (sockets etc) so tests can be run
-   	remotely.
-   * More details about objects, for richer testing
-   * Improved appearance: Icons etc
-   * Support multiple child windows.
- 
+
+  * Allow multiple check runs in one test run
+  * Allow signaling through other means (sockets etc) so tests can be run
+    remotely.
+  * More details about objects, for richer testing
+  * Improved appearance: Icons etc
+  * Support multiple child windows.
+
 
