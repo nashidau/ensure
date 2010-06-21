@@ -102,7 +102,6 @@ Future Work
 -----------
 
 More tests:
-   * Image object has valid image file
    * Object not clipped to it's smart parent (subtly different)
    * Objects of size 1x1: Probably default not resized
    * Objects of size 32x32: Probably a smart object not resized
