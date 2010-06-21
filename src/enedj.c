@@ -144,6 +144,11 @@ enedj_load(const char *filename){
 	edjes = eina_list_append(edjes, images);
 
 	EINA_LIST_FOREACH(file->image_dir->entries, l, ei){
+		if (ei->id > images->nalloc){
+			printf("Illegal ID (%d, max %d)\n",ei->id,
+					images->nalloc);
+			continue;
+		}
 		/* FIXME: Check it's in range */
 		images->images[ei->id] = strdup(ei->entry);
 	}

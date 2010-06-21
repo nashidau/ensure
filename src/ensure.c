@@ -366,7 +366,7 @@ asn_state_get(const void *data, Evas_Object *obj ensure_unused,
 }
 static void
 asn_del(const void *data ensure_unused, Evas_Object *obj ensure_unused){
-	/* FIXME: REmove  item ref */
+	/* FIXME: Remove  item ref */
 }
 
 static void
@@ -537,8 +537,7 @@ on_run(void *data, Evas_Object *button ensure_unused, void *event_info ensure_un
 	 */
 	switch ((pid = fork())){
 	case -1:
-		/* FIXME: error message handling */
-		fprintf(stderr,"Unable to fork\n");
+		perror("fork()");
 		exit(7);
 		break;
 	case 0:
@@ -566,7 +565,7 @@ on_run(void *data, Evas_Object *button ensure_unused, void *event_info ensure_un
 static void
 dochild(char **args, int fd){
 	char buf[4];
-	/* FIXME: Should append: Not overwrite */
+
 	setenv("LD_PRELOAD", "./libensure.so.0",1);
 	snprintf(buf, sizeof(buf), "%d",fd);
 	setenv("ENSURE_FD", buf, 1);
@@ -583,10 +582,9 @@ ensure_assurance_add(struct assurance *enasn){
 
 	assert((int)enasn->severity >= 0);
 	assert(enasn->severity < ENSURE_N_SEVERITIES);
-	/* FIXME: Do check! 
 	if ((int)enasn->severity < 0 && enasn->severity >= ENSURE_N_SEVERITIES){
 		return -1;
-	}*/
+	}
 
 	info = calloc(1,sizeof(struct asninfo));
 	info->enabled = true;

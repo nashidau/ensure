@@ -228,8 +228,10 @@ parse_geo(struct enobj *eno, const char *prefix, char **linep){
 
 	ct = sscanf(*linep, "%d%d(%dx%d)%n", &eno->x, &eno->y,
 			&eno->w,&eno->h,&len);
-	/* FIXME: Check count (ct) */
-	//printf("Geo: %s -> %d %d %d %d\n",*linep,eno->x,eno->y,eno->w,eno->h);
+	if (ct != 4){
+		printf("Failed to parse geo '%.30s'\n",*linep);
+		return -1;
+	}
 	*linep += len;
 	return 0;
 }
