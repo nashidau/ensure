@@ -3,6 +3,13 @@
 #define ENOBJMAGIC 0x8d882abc
 #endif
 
+enum edjemember {
+	EDJEMEMBER_NOTCHECKED,
+	EDJEMEMBER_TRUE,
+	EDJEMEMBER_FALSE
+};
+
+
 struct enobj {
 	int	magic;
 
@@ -38,6 +45,8 @@ struct enobj {
 		struct {
 			const char *file;
 			const char *key;
+			const char *edjefile;
+			enum edjemember edjemember;
 		} image;
 		struct {
 			const char *file;

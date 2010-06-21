@@ -6,6 +6,7 @@ LDFLAGS+=`pkg-config --libs ${PKGS}` -rdynamic -ldl
 OBJECTS=			\
 		display.o	\
 		enasn.o		\
+		enedj.o		\
 		ensure.o	\
 		enobj.o		\
 		parser.o

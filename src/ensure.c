@@ -104,7 +104,7 @@ Evas_Object *configlist;
 Evas_Object *box;
 Evas_Object *mainwindow;
 
-
+#include "enedj.h"
 int
 elm_main(int argc, char **argv){
 

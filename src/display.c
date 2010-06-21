@@ -8,6 +8,7 @@
 #include "enobj.h"
 #include "ensure.h"
 #include "enasn.h"
+#include "enedj.h"
 
 extern Evas_Object *mainwindow;
 
@@ -85,6 +86,30 @@ display_enobj_cb(void *enobjv, Evas_Object *obj ensure_unused,
 				enobj->data.image.file?:"<em>None</em>");
 		if (enobj->data.image.key)
 			add_text(win,tbl,&pos,"Key:", enobj->data.image.key);
+		if (enobj->data.image.edjemember == EDJEMEMBER_NOTCHECKED){
+			if (!enobj->data.image.file)
+				enobj->data.image.edjemember = EDJEMEMBER_FALSE;
+			else {
+				int len;
+				len = strlen(enobj->data.image.file);
+				len -= 4;
+				if (streq(enobj->data.image.file+len,".edj")){
+					enobj->data.image.edjefile =
+						enedj_get_imagename(
+							enobj->data.image.file,
+							enobj->data.image.key);
+					enobj->data.image.edjemember =
+						EDJEMEMBER_TRUE;
+				} else {
+					enobj->data.image.edjemember =
+						EDJEMEMBER_FALSE;
+				}
+			}
+		}
+		if (enobj->data.image.edjefile){
+			add_text(win,tbl,&pos,"Original:",
+					enobj->data.image.edjefile);
+		}
 	} else if (strcmp(enobj->type,"edje") == 0){
 		add_heading(win,tbl,&pos,"Edje Object");
 		add_text(win,tbl,&pos,"File:",
