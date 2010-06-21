@@ -89,13 +89,13 @@ Currently checks for:
   * Object of negative size
   * Object off screen
   * Object outside it's clip
-  * Object & Clip are both smart members
+  * Object & clip are both smart members
   * Empty text
   * Font 5 pts or less
   * Font 100 pts of more
   * Object outside of smart object
   * Object clipped to a smart's clip, but not a member
-  * Edje Objects with load errors
+  * Edje or image objects with load errors
 
 
 Future Work
