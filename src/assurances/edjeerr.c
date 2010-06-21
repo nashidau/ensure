@@ -29,7 +29,7 @@ static const char *edjetype;
 static void *
 init_test(struct ensure *en ensure_unused){
 	if (edjetype == NULL)
-		edjetype = eina_stringshare_add("text");
+		edjetype = eina_stringshare_add("edje");
 	return NULL;
 }
 
