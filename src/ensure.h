@@ -22,3 +22,9 @@ int ensure_bug(struct enobj *enobj, enum ensure_severity sev,
 
 
 int ensure_enobj_err_list_add(struct enobj *);
+
+
+#ifndef streq
+#define streq(a, b) (strcmp((a), (b)) == 0)
+#endif
+
