@@ -33,6 +33,13 @@ display_enobj_cb(void *enobjv, Evas_Object *obj ensure_unused,
 	assert(enobjv);
 	assert(enobj->magic == ENOBJMAGIC);
 
+	if (enobj->win){
+		evas_object_show(enobj->win);
+		elm_win_raise(enobj->win);
+		elm_win_activate(enobj->win);
+		return;
+	}
+
 	if (enobj->name){
 		snprintf(buf,sizeof(buf), "%.*s (%llx - %s)",70,enobj->name,
 				(long long int)enobj->id, enobj->type);
@@ -42,6 +49,7 @@ display_enobj_cb(void *enobjv, Evas_Object *obj ensure_unused,
 	}
 
 	win = elm_win_add(mainwindow, buf, ELM_WIN_BASIC);
+	enobj->win = win;
 	elm_win_title_set(win, buf);
 	elm_win_autodel_set(win, true);
 

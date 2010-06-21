@@ -62,6 +62,8 @@ struct enobj {
 	struct {
 		struct enobj *parent,*clip;
 	} cache;
+
+	Evas_Object *win;
 };
 
 extern Eina_Hash *objdb;
