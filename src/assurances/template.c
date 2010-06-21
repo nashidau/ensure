@@ -7,7 +7,7 @@
 
 static int object_check(struct ensure*,struct enobj*,void *data);
 static void *init_test(struct ensure*);
-static void fini_test(struct ensure *en, void *data);
+static int fini_test(struct ensure *en, void *data);
 
 struct assurance assurance = {
 	.summary = "Template",
@@ -36,9 +36,11 @@ init_test(struct ensure *en ensure_unused){
  * Cleanup or finalisation test.
  * Also can be used to add bugs built from some sort of local store.
  */
-static void
+static int
 fini_test(struct ensure *en ensure_unused, void *data ensure_unused){
 	eina_stringshare_del(texttype);
+	texttype = NULL;
+	return 0;
 }
 
 /**
