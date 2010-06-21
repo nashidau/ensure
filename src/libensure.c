@@ -9,6 +9,7 @@
 #include <Eina.h>
 #include <Ecore.h>
 #include <Ecore_Evas.h>
+#include <Edje.h>
 #include <Evas.h>
 
 
@@ -133,7 +134,15 @@ libensure_objdump(Evas_Object *o, Evas_Object *parent){
 	} else if (strcmp(type, "rectangle") == 0){
 
 	} else if (strcmp(type, "edje") == 0){
-
+		const char *file, *group;
+		int err;
+		edje_object_file_get(o,&file,&group);
+		fprintf(outfile, "Edje: '%s' '%s' ",file,group);
+		err = edje_object_load_error_get(o);
+		if (err != EDJE_LOAD_ERROR_NONE){
+			fprintf(outfile,"EdjeErr: '%s' ",
+					edje_load_error_str(err));
+		}
 	}
 
 

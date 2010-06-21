@@ -85,6 +85,14 @@ display_enobj_cb(void *enobjv, Evas_Object *obj ensure_unused,
 				enobj->data.image.file?:"<em>None</em>");
 		if (enobj->data.image.key)
 			add_text(win,tbl,&pos,"Key:", enobj->data.image.key);
+	} else if (strcmp(enobj->type,"edje") == 0){
+		add_heading(win,tbl,&pos,"Edje Object");
+		add_text(win,tbl,&pos,"File:",
+				enobj->data.edje.file?:"<em>None</em>");
+		add_text(win,tbl,&pos,"Group:", enobj->data.edje.group);
+		if (enobj->data.edje.err)
+			add_text(win,tbl,&pos,"Error:", enobj->data.edje.err);
+
 	}
 
 	if (enobj->bugs){

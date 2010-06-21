@@ -39,6 +39,11 @@ struct enobj {
 			const char *file;
 			const char *key;
 		} image;
+		struct {
+			const char *file;
+			const char *group;
+			const char *err;
+		} edje;
 	} data;
 
 	Elm_Genlist_Item *genitem;

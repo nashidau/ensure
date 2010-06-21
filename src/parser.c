@@ -32,6 +32,8 @@ static int parse_image(struct enobj *eno, const char *prefix, char **linep);
 static int parse_text(struct enobj *eno, const char *prefix, char **linep);
 static int parse_font(struct enobj *eno, const char *prefix, char **linep);
 static int parse_source(struct enobj *eno, const char *prefix, char **linep);
+static int parse_edje(struct enobj *eno, const char *prefix, char **linep);
+static int parse_edje_err(struct enobj *eno, const char *prefix, char **linep);
 
 
 
@@ -49,6 +51,8 @@ static const struct parser {
 	{ "Text:",	parse_text },
 	{ "Font:",	parse_font },
 	{ "FontSource:",parse_source },
+	{ "Edje:",	parse_edje },
+	{ "EdjeErr:",	parse_edje_err },
 
 };
 #define N_PARSERS ((int)(sizeof(parsers)/sizeof(parsers[0])))
@@ -280,6 +284,23 @@ parse_source(struct enobj *eno, const char *prefix ensure_unused, char **linep){
 }
 
 
+static int
+parse_edje(struct enobj *eno, const char *prefix ensure_unused, char **linep){
+	char *p;
+	eno->data.edje.file = parse_string(linep,true);
+	p = *linep;
+	while (isspace(*p)) p ++;
+	eno->data.edje.group = parse_string(linep,true);
+
+	return 0;
+}
+
+
+static int
+parse_edje_err(struct enobj *eno, const char *prefix, char **linep){
+	eno->data.edje.err = parse_string(linep,true);
+	return 0;
+}
 
 static char *
 parse_string(char **linep,bool shared){
@@ -297,3 +318,5 @@ parse_string(char **linep,bool shared){
 	else
 		return strndup(start, p - start);
 }
+
+
