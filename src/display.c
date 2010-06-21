@@ -22,6 +22,10 @@ static void add_fmt(Evas_Object *win, Evas_Object *tbl, int *pos,
 		const char *label, const char *fmt, ...);
 static const char *sev_string(enum ensure_severity sev);
 
+
+static void enobj_del(void *enobjv, Evas_Object *obj, void *event_info);
+
+
 void
 display_enobj_cb(void *enobjv, Evas_Object *obj ensure_unused,
 		void *event ensure_unused){
@@ -52,6 +56,8 @@ display_enobj_cb(void *enobjv, Evas_Object *obj ensure_unused,
 	enobj->win = win;
 	elm_win_title_set(win, buf);
 	elm_win_autodel_set(win, true);
+	evas_object_smart_callback_add(win, "delete-request",enobj_del, enobj);
+
 
 	bg = elm_bg_add(win);
         elm_win_resize_object_add(win, bg);
@@ -249,4 +255,17 @@ sev_string(enum ensure_severity sev){
 	default:
 		return "Unknown?";
 	}
+}
+
+
+/**
+ * Callback for a window being deleted.
+ *
+ */
+static void
+enobj_del(void *enobjv, Evas_Object *obj, void *event_info){
+	struct enobj *enobj = enobjv;
+	printf("Nulling a window\n");
+	enobj->win = NULL;
+
 }

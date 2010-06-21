@@ -51,8 +51,6 @@ enasn_load(const char *path){
 		if (!(p = strstr(de->d_name,".asn"))) continue;
 		if (p[4]) continue;
 
-		printf("Found: %s\n",de->d_name);
-
 		snprintf(buf,sizeof(buf),"%s/%s",path,de->d_name);
 		dlh = dlopen(buf,RTLD_NOW|RTLD_LOCAL);
 		if (!dlh){
@@ -82,7 +80,6 @@ enasn_load(const char *path){
 
 		ensure_assurance_add(asn);
 
-		printf("Loaded %s\n",asn->summary);
 	}
 
 	return 0;
